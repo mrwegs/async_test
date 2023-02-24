@@ -40,15 +40,35 @@
 #     pal_gen.send(10 ** digits)
 #
 
+def coroutine(func):
+    def inner(*args, **kwargs):
+        g = func(*args, *kwargs)
+        next(g)
+        return g
 
+    return inner
+
+
+class MyException(BaseException):
+    pass
+
+
+@coroutine
 def average():
     count = 0
     summ = 0
     average = None
 
     while True:
-        number = yield average
-        count += 1
-        summ += number
-        average = round(summ / count)
+        try:
+            number = yield average
+        except StopIteration:
+            print('Done')
+            break
+        else:
+            count += 1
+            summ += number
+            average = round(summ / count)
+
+    return average
 
